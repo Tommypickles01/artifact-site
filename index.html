@@ -642,6 +642,71 @@
             border-radius: 50%;
         }
 
+        /* Chart */
+        .chart-section {
+            padding: 8rem 2rem;
+            position: relative;
+        }
+
+        .chart-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-dim), transparent);
+        }
+
+        .chart-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            background: var(--bg-card);
+        }
+
+        .chart-container iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            display: block;
+        }
+
+        .chart-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-elevated);
+        }
+
+        .chart-contract {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            word-break: break-all;
+        }
+
+        .chart-contract span {
+            color: var(--accent-dim);
+            font-weight: 500;
+        }
+
+        .chart-link {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent-dim);
+            text-decoration: none;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        .chart-link:hover { color: var(--accent-bright); }
+
         /* Journey */
         .journey-section {
             padding: 8rem 2rem;
@@ -909,6 +974,8 @@
             .artifact-showcase { gap: 3rem; }
             .pages-section { padding: 5rem 1.5rem; }
             .artifact-section { padding: 6rem 1.5rem; }
+            .chart-section { padding: 6rem 1.5rem; }
+            .chart-container iframe { height: 500px; }
             .journey-section { padding: 6rem 1.5rem; }
             .principles-section { padding: 6rem 1.5rem; }
             .cta-section { padding: 6rem 1.5rem; }
@@ -980,6 +1047,11 @@
             .artifact-details h2 { font-size: 1.6rem; }
             .artifact-list li { font-size: 0.9rem; padding: 0.5rem 0; }
 
+            /* Chart */
+            .chart-section { padding: 4rem 1rem; }
+            .chart-container iframe { height: 420px; }
+            .chart-meta { flex-direction: column; gap: 0.6rem; align-items: flex-start; }
+
             /* Journey */
             .journey-section { padding: 4rem 1rem; }
             .timeline { padding-left: 0.5rem; }
@@ -1033,6 +1105,7 @@
             <li><a href="#origin">Origin</a></li>
             <li><a href="#story">The Story</a></li>
             <li><a href="#artifact">The Artifact</a></li>
+            <li><a href="#chart">Chart</a></li>
             <li><a href="#journey">The Journey</a></li>
             <li><a href="#community">Community</a></li>
         </ul>
@@ -1232,6 +1305,20 @@
                     <li>Verification is possible through line work and structure</li>
                 </ul>
                 <p class="page-text" style="font-style: italic; color: var(--text-muted); margin-top: 1.5rem;">The lines can be examined. The proportions match. The history holds up.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="chart-section" id="chart">
+        <div class="section-header reveal">
+            <div class="section-label">Live Data</div>
+            <h2 class="section-title">The Chart</h2>
+        </div>
+        <div class="chart-container reveal reveal-delay-1">
+            <iframe src="https://dexscreener.com/solana/zYndWmtJuA8dQRStQi9FvAQ7GWFpHXCEPedw4Mipump?embed=1&theme=dark&info=0" title="$ARTIFACT Live Chart" loading="lazy" allowfullscreen></iframe>
+            <div class="chart-meta">
+                <div class="chart-contract"><span>CA:</span> zYndWmtJuA8dQRStQi9FvAQ7GWFpHXCEPedw4Mipump</div>
+                <a href="https://dexscreener.com/solana/zYndWmtJuA8dQRStQi9FvAQ7GWFpHXCEPedw4Mipump" target="_blank" class="chart-link">View on DexScreener &rarr;</a>
             </div>
         </div>
     </section>
