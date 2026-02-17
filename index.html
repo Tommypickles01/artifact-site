@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$ARTIFACT - Beast Artifact</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #121214;
+            --bg-secondary: #18181b;
+            --bg-card: #1e1e22;
+            --bg-elevated: #252528;
+            --text-primary: #f0ebe3;
+            --text-secondary: #b8ae9e;
+            --text-muted: #7d7468;
+            --accent: #d4b55a;
+            --accent-bright: #e8cc6e;
+            --accent-dim: #a08a3a;
+            --accent-glow: rgba(212, 181, 90, 0.2);
+            --accent-glow-strong: rgba(212, 181, 90, 0.35);
+            --border: rgba(212, 181, 90, 0.15);
+            --border-bright: rgba(212, 181, 90, 0.25);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-dim) var(--bg-primary);
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 3px; }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.4s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(18, 18, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 3rem;
+        }
+
+        .nav-logo {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent-bright);
+            letter-spacing: 0.2em;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 1px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--accent-bright); }
+        .nav-links a:hover::after { width: 100%; }
+
+        /* HERO */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(ellipse at center, rgba(212, 181, 90, 0.06) 0%, transparent 60%);
+        }
+
+        .bg-text-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            font-family: 'Cinzel', serif;
+            font-size: 10rem;
+            font-weight: 700;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(212, 181, 90, 0.14);
+            letter-spacing: 0.05em;
+            animation: scrollText 40s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes scrollText {
+            0% { transform: translateY(-50%) translateX(0); }
+            100% { transform: translateY(-50%) translateX(-50%); }
+        }
+
+        /* 3D Book */
+        .scene {
+            width: 450px;
+            height: 600px;
+            perspective: 1800px;
+            position: relative;
+            z-index: 2;
+            cursor: grab;
+        }
+
+        .scene:active { cursor: grabbing; }
+
+        .book-3d {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out;
+        }
+
+        .book-3d .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform-origin: left center;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .page-front, .page-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 2px 8px 8px 2px;
+            overflow: hidden;
+        }
+
+        .page-back {
+            transform: rotateY(180deg);
+        }
+
+        .page-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem 2.5rem;
+        }
+
+        .cover-front {
+            background: linear-gradient(145deg, #1f1c17 0%, #141210 100%);
+            border: 1px solid rgba(212, 181, 90, 0.25);
+            box-shadow: 0 0 40px rgba(0,0,0,0.4), inset 0 0 60px rgba(0,0,0,0.3);
+        }
+
+        .cover-front .page-content { gap: 1.2rem; }
+
+        .cover-sketch {
+            width: 240px;
+            height: 220px;
+            border: 1px solid rgba(212, 181, 90, 0.35);
+            padding: 8px;
+            position: relative;
+        }
+
+        .cover-sketch::before {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px solid rgba(212, 181, 90, 0.18);
+        }
+
+        .cover-sketch img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            image-rendering: -webkit-optimize-contrast;
+        }
+
+        .cover-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-bright);
+            letter-spacing: 0.3em;
+            text-align: center;
+        }
+
+        .cover-sub {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-style: italic;
+            letter-spacing: 0.08em;
+        }
+
+        .inner-page {
+            background: linear-gradient(135deg, #f8f3ea, #efe8db);
+            color: #2a2520;
+        }
+
+        .inner-page .page-content {
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 2.5rem 2.8rem;
+        }
+
+        .inner-page .pg-num {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.55rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #a09080;
+            margin-bottom: 1.5rem;
+            align-self: flex-end;
+        }
+
+        .inner-page .pg-heading {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #3a2e20;
+            margin-bottom: 1rem;
+            letter-spacing: 0.04em;
+        }
+
+        .inner-page .pg-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.05rem;
+            color: #4a3f35;
+            line-height: 1.85;
+        }
+
+        .inner-page .pg-text em { color: #2a2015; font-style: italic; }
+        .inner-page .pg-text strong { color: #8b6a2f; font-weight: 600; }
+
+        .cover-back {
+            background: linear-gradient(145deg, #1a1815 0%, #0f0d0b 100%);
+            border: 1px solid rgba(212, 181, 90, 0.2);
+            box-shadow: 0 0 40px rgba(0,0,0,0.4);
+        }
+
+        .cover-back .page-content { gap: 1rem; }
+
+        .cover-back .cb-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.7;
+            max-width: 300px;
+        }
+
+        .cover-back .cb-text span { color: var(--accent-bright); }
+
+        .cover-back .cb-logo {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: var(--accent-dim);
+            letter-spacing: 0.25em;
+            margin-top: 1rem;
+        }
+
+        .book-shadow {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 350px;
+            height: 40px;
+            background: radial-gradient(ellipse, rgba(0,0,0,0.4) 0%, transparent 70%);
+            filter: blur(10px);
+            z-index: 1;
+        }
+
+        /* Page nav buttons */
+        .page-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 2.5rem;
+            z-index: 10;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .page-nav-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 0.6rem 1.2rem;
+            border: 1px solid var(--border);
+            background: rgba(30, 30, 34, 0.8);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+            backdrop-filter: blur(8px);
+        }
+
+        .page-nav-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent-bright);
+            background: rgba(212, 181, 90, 0.08);
+        }
+
+        .page-nav-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        .interact-hint {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            opacity: 0.6;
+            animation: fadeHint 4s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        @keyframes fadeHint {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        .zoom-controls {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .zoom-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            background: rgba(30, 30, 34, 0.8);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+            backdrop-filter: blur(8px);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .zoom-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent-bright);
+        }
+
+        /* Page Slider Section */
+        .pages-section {
+            padding: 7rem 2rem;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent-dim);
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            letter-spacing: 0.06em;
+        }
+
+        .slider-wrapper { max-width: 1100px; margin: 0 auto; }
+        .slider-viewport { overflow: hidden; border-radius: 6px; }
+
+        .slider-track {
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .page-spread {
+            min-width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 520px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .page-spread::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 1px; height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--border), transparent);
+        }
+
+        .page-left, .page-right {
+            padding: 3.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .page-number {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .page-heading {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            font-weight: 500;
+            color: var(--accent-bright);
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.04em;
+            line-height: 1.3;
+        }
+
+        .page-text {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            line-height: 1.85;
+        }
+
+        .page-text em { color: var(--text-primary); font-style: italic; }
+        .page-text strong { color: var(--accent-bright); font-weight: 500; }
+
+        .page-image-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .page-image-container img {
+            max-width: 100%;
+            max-height: 380px;
+            object-fit: contain;
+            border: 1px solid var(--border);
+            padding: 12px;
+            background: rgba(245, 240, 232, 0.03);
+            image-rendering: -webkit-optimize-contrast;
+        }
+
+        .slider-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 2.5rem;
+        }
+
+        .slider-btn {
+            width: 48px; height: 48px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .slider-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent-bright);
+            background: rgba(212, 181, 90, 0.05);
+        }
+
+        .slider-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .slider-btn svg { width: 18px; height: 18px; }
+
+        .slider-dots { display: flex; gap: 0.6rem; }
+
+        .slider-dot {
+            width: 8px; height: 8px;
+            border: 1px solid var(--accent-dim);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 50%;
+        }
+
+        .slider-dot.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .slider-dot:hover { border-color: var(--accent); }
+
+        /* Artifact Section */
+        .artifact-section { padding: 8rem 2rem; }
+
+        .artifact-showcase {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .artifact-image-wrapper { position: relative; }
+
+        .artifact-image-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -20px; left: -20px; right: 20px; bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .artifact-image-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 20px; left: 20px; right: -20px; bottom: -20px;
+            border: 1px solid var(--border);
+        }
+
+        .artifact-img {
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            image-rendering: -webkit-optimize-contrast;
+        }
+
+        .artifact-details h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.06em;
+        }
+
+        .artifact-details h2 span { color: var(--accent-bright); }
+
+        .artifact-list { list-style: none; margin: 2rem 0; }
+
+        .artifact-list li {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 1rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .artifact-list li::before {
+            content: '';
+            width: 5px; height: 5px;
+            background: var(--accent);
+            flex-shrink: 0;
+            border-radius: 50%;
+        }
+
+        /* Journey */
+        .journey-section {
+            padding: 8rem 2rem;
+            background: var(--bg-secondary);
+            position: relative;
+        }
+
+        .journey-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-dim), transparent);
+        }
+
+        .timeline { max-width: 700px; margin: 0 auto; position: relative; }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0;
+            width: 1px; height: 100%;
+            background: linear-gradient(to bottom, var(--accent-dim), transparent);
+        }
+
+        .timeline-item {
+            padding: 0 0 3.5rem 3rem;
+            position: relative;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.6s ease;
+        }
+
+        .timeline-item.visible { opacity: 1; transform: translateX(0); }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -4px; top: 6px;
+            width: 9px; height: 9px;
+            border: 1px solid var(--accent);
+            background: var(--bg-secondary);
+            transform: rotate(45deg);
+        }
+
+        .timeline-phase {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--accent-dim);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .timeline-desc {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Principles */
+        .principles-section { padding: 8rem 2rem; }
+
+        .principles-grid {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .principle-card {
+            padding: 2.5rem;
+            background: var(--bg-primary);
+            transition: all 0.4s;
+        }
+
+        .principle-card:hover { background: var(--bg-card); }
+
+        .principle-icon {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: var(--accent-dim);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .principle-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.04em;
+        }
+
+        .principle-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* CTA */
+        .cta-section {
+            padding: 8rem 2rem;
+            text-align: center;
+            background: var(--bg-secondary);
+            position: relative;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-dim), transparent);
+        }
+
+        .cta-content { max-width: 600px; margin: 0 auto; }
+
+        .cta-quote {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-style: italic;
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-quote span { color: var(--accent-bright); }
+
+        .cta-sub {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            line-height: 1.8;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--bg-primary);
+            background: var(--accent);
+            text-decoration: none;
+            padding: 1rem 2.5rem;
+            border: 1px solid var(--accent);
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .btn-primary:hover { background: transparent; color: var(--accent-bright); }
+
+        .btn-secondary {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 1rem 2.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent-bright); }
+
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-logo {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            color: var(--accent-dim);
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+        }
+
+        .footer-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            line-height: 2;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .footer-links a {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover { color: var(--accent-bright); }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px;
+        }
+
+        .nav-toggle span {
+            width: 22px; height: 1px;
+            background: var(--text-secondary);
+            transition: all 0.3s;
+        }
+
+        /* Tablet */
+        @media (max-width: 900px) {
+            .scene { width: 320px; height: 440px; }
+            .cover-sketch { width: 170px; height: 150px; }
+            .cover-title { font-size: 1.1rem; letter-spacing: 0.2em; }
+            .cover-sub { font-size: 0.8rem; }
+            .bg-text-track { font-size: 5rem; }
+            .zoom-controls { display: none; }
+            .artifact-showcase { gap: 3rem; }
+            .pages-section { padding: 5rem 1.5rem; }
+            .artifact-section { padding: 6rem 1.5rem; }
+            .journey-section { padding: 6rem 1.5rem; }
+            .principles-section { padding: 6rem 1.5rem; }
+            .cta-section { padding: 6rem 1.5rem; }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            /* Nav */
+            nav { padding: 1rem 1.2rem; }
+            nav.scrolled { padding: 0.8rem 1.2rem; }
+            .nav-logo { font-size: 1.1rem; letter-spacing: 0.15em; }
+            .nav-toggle { display: flex; }
+            .nav-links {
+                position: fixed;
+                top: 0; right: -100%;
+                width: 260px; height: 100vh;
+                background: rgba(18, 18, 20, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 5rem 2rem;
+                gap: 2rem;
+                transition: right 0.4s ease;
+                border-left: 1px solid var(--border);
+                z-index: 1001;
+            }
+            .nav-links.open { right: 0; }
+            .nav-links a { font-size: 0.8rem; }
+
+            /* Hero / Book */
+            .hero { min-height: 100vh; min-height: 100dvh; padding: 1rem; }
+            .scene { width: 260px; height: 360px; }
+            .cover-sketch { width: 140px; height: 125px; }
+            .cover-title { font-size: 0.95rem; letter-spacing: 0.18em; }
+            .cover-sub { font-size: 0.75rem; }
+            .bg-text-track { font-size: 3.5rem; }
+            .book-shadow { width: 220px; bottom: -20px; }
+
+            .inner-page .page-content { padding: 1.8rem 1.5rem; }
+            .inner-page .pg-heading { font-size: 1.1rem; margin-bottom: 0.7rem; }
+            .inner-page .pg-text { font-size: 0.9rem; line-height: 1.7; }
+            .inner-page .pg-num { font-size: 0.5rem; margin-bottom: 1rem; }
+
+            .page-nav { gap: 0.35rem; margin-top: 1.8rem; padding: 0 0.5rem; }
+            .page-nav-btn { font-size: 0.5rem; padding: 0.45rem 0.65rem; letter-spacing: 0.08em; }
+            .interact-hint { font-size: 0.5rem; bottom: 1rem; }
+
+            /* Sections */
+            .section-header { margin-bottom: 2.5rem; }
+            .section-label { font-size: 0.6rem; letter-spacing: 0.2em; }
+            .section-title { font-size: 1.4rem; }
+
+            /* Slider */
+            .pages-section { padding: 4rem 1rem; }
+            .page-spread { grid-template-columns: 1fr; min-height: auto; }
+            .page-spread::before { display: none; }
+            .page-left, .page-right { padding: 1.8rem 1.5rem; }
+            .page-heading { font-size: 1.3rem; margin-bottom: 1rem; }
+            .page-text { font-size: 0.95rem; }
+            .page-image-container { padding: 1rem; }
+            .page-image-container img { max-height: 240px; padding: 8px; }
+            .slider-controls { gap: 1.2rem; margin-top: 1.5rem; }
+            .slider-btn { width: 40px; height: 40px; }
+
+            /* Artifact */
+            .artifact-section { padding: 4rem 1rem; }
+            .artifact-showcase { grid-template-columns: 1fr; gap: 2.5rem; }
+            .artifact-image-wrapper::before { top: -12px; left: -12px; right: 12px; bottom: 12px; }
+            .artifact-image-wrapper::after { top: 12px; left: 12px; right: -12px; bottom: -12px; }
+            .artifact-details h2 { font-size: 1.6rem; }
+            .artifact-list li { font-size: 0.9rem; padding: 0.5rem 0; }
+
+            /* Journey */
+            .journey-section { padding: 4rem 1rem; }
+            .timeline { padding-left: 0.5rem; }
+            .timeline-item { padding: 0 0 2.5rem 2rem; }
+            .timeline-title { font-size: 1.1rem; }
+            .timeline-desc { font-size: 0.9rem; }
+
+            /* Principles */
+            .principles-section { padding: 4rem 1rem; }
+            .principles-grid { grid-template-columns: 1fr; }
+            .principle-card { padding: 1.8rem; }
+            .principle-icon { font-size: 1.5rem; }
+            .principle-title { font-size: 1rem; }
+            .principle-desc { font-size: 0.88rem; }
+
+            /* CTA */
+            .cta-section { padding: 4rem 1rem; }
+            .cta-quote { font-size: 1.3rem; }
+            .cta-sub { font-size: 0.95rem; margin-bottom: 2rem; }
+            .cta-buttons { flex-direction: column; align-items: center; gap: 1rem; }
+            .btn-primary, .btn-secondary { width: 100%; max-width: 280px; text-align: center; }
+
+            /* Footer */
+            footer { padding: 2.5rem 1rem; }
+            .footer-links { gap: 1.2rem; flex-wrap: wrap; }
+        }
+
+        /* Small phones */
+        @media (max-width: 400px) {
+            .scene { width: 220px; height: 310px; }
+            .cover-sketch { width: 115px; height: 100px; }
+            .cover-title { font-size: 0.8rem; }
+            .bg-text-track { font-size: 2.5rem; }
+            .page-nav-btn { font-size: 0.45rem; padding: 0.4rem 0.5rem; }
+            .page-left, .page-right { padding: 1.3rem 1rem; }
+            .page-heading { font-size: 1.1rem; }
+            .inner-page .page-content { padding: 1.3rem 1rem; }
+            .inner-page .pg-heading { font-size: 0.95rem; }
+            .inner-page .pg-text { font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="navbar">
+        <a href="#" class="nav-logo">$ARTIFACT</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#origin">Origin</a></li>
+            <li><a href="#story">The Story</a></li>
+            <li><a href="#artifact">The Artifact</a></li>
+            <li><a href="#journey">The Journey</a></li>
+            <li><a href="#community">Community</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero" id="origin">
+        <div class="hero-bg"></div>
+        <div class="bg-text-track" aria-hidden="true">$ARTIFACT &nbsp;&nbsp;&nbsp; $ARTIFACT &nbsp;&nbsp;&nbsp; $ARTIFACT &nbsp;&nbsp;&nbsp; $ARTIFACT &nbsp;&nbsp;&nbsp; $ARTIFACT &nbsp;&nbsp;&nbsp; $ARTIFACT &nbsp;&nbsp;&nbsp; $ARTIFACT &nbsp;&nbsp;&nbsp; $ARTIFACT &nbsp;&nbsp;&nbsp;</div>
+
+        <div class="scene" id="scene">
+            <div class="book-3d" id="book3d">
+                <div class="page" id="page0" style="z-index: 5;">
+                    <div class="page-front cover-front">
+                        <div class="page-content">
+                            <div class="cover-sketch">
+                                <img src="beast-sketch-hq.jpg" alt="Beast Artifact Sketch">
+                            </div>
+                            <div class="cover-title">BEAST ARTIFACT</div>
+                            <div class="cover-sub">The Origin Point</div>
+                        </div>
+                    </div>
+                    <div class="page-back inner-page">
+                        <div class="page-content">
+                            <span class="pg-num">Page 1</span>
+                            <h3 class="pg-heading">What This Is</h3>
+                            <p class="pg-text">Beast Artifact is a community-centered digital asset built around a single, physical relic: <em>the original pencil sketch where a now-unmistakable beast first took shape.</em><br><br>The coin does not represent the artifact. It exists to <strong>protect the story</strong> around it, power the community that discovered it, and eventually determine who will carry it forward.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="page" id="page1" style="z-index: 4;">
+                    <div class="page-front inner-page">
+                        <div class="page-content">
+                            <span class="pg-num">Page 2</span>
+                            <h3 class="pg-heading">The Artifact</h3>
+                            <p class="pg-text">A single sheet of aged paper bearing a pencil sketch of a roaring beast, frozen mid-snarl. The silhouette, the eyes, the expression &mdash; <em>instantly recognizable.</em><br><br>This is not a recreation. It is not fan art.<br><strong>It is the origin point.</strong></p>
+                        </div>
+                    </div>
+                    <div class="page-back inner-page">
+                        <div class="page-content">
+                            <span class="pg-num">Page 3</span>
+                            <h3 class="pg-heading">Signs of Age</h3>
+                            <p class="pg-text"><em>Creases from being folded and hidden.</em><br><br><em>Stains from unknown moments in its journey.</em><br><br><em>Worn edges from time and survival.</em><br><br>Every mark is part of its story. The lines can be examined. The proportions match. The history holds up.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="page" id="page2" style="z-index: 3;">
+                    <div class="page-front inner-page">
+                        <div class="page-content">
+                            <span class="pg-num">Page 4</span>
+                            <h3 class="pg-heading">The Discovery</h3>
+                            <p class="pg-text">The artifact surfaced because <em>the person holding it is the same person who first created it.</em><br><br>Years ago, before the beast became a symbol, the explorer drew it. Not for an audience. Not for a brand. Simply as an idea &mdash; <strong>pencil meeting paper, instinct guiding hand.</strong></p>
+                        </div>
+                    </div>
+                    <div class="page-back inner-page">
+                        <div class="page-content">
+                            <span class="pg-num">Page 5</span>
+                            <h3 class="pg-heading">The Realization</h3>
+                            <p class="pg-text">When the explorer returned to the sketch, the recognition was unavoidable. The proportions. The snarl. The unmistakable silhouette.<br><br><em>The same lines that would later be refined, digitized, and repeated at global scale were already there.</em><br><br>The proof was already in his possession.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="page" id="page3" style="z-index: 2;">
+                    <div class="page-front inner-page">
+                        <div class="page-content">
+                            <span class="pg-num">Page 6</span>
+                            <h3 class="pg-heading">The Explorer</h3>
+                            <p class="pg-text">The artifact is currently held by a nameless explorer &mdash; <em>a guide, not an owner.</em><br><br>Does not sell. Does not promise outcomes. Does not claim credit.<br><br>Their role: <strong>protect the artifact</strong> until the community it belongs to reveals itself.</p>
+                        </div>
+                    </div>
+                    <div class="page-back inner-page">
+                        <div class="page-content">
+                            <span class="pg-num">Page 7</span>
+                            <h3 class="pg-heading">The Community</h3>
+                            <p class="pg-text">This project has no audience. <strong>Only believers.</strong><br><br>Every reply, share, theory, and act of attention strengthens the story.<br><br><em>The community does not watch the story. They power it.</em></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="page" id="page4" style="z-index: 1;">
+                    <div class="page-front inner-page">
+                        <div class="page-content">
+                            <span class="pg-num">Page 8</span>
+                            <h3 class="pg-heading">The Long Arc</h3>
+                            <p class="pg-text"><strong>Discovery</strong> &mdash; The artifact is revealed.<br><strong>Awakening</strong> &mdash; Its influence becomes undeniable.<br><strong>The Hunt</strong> &mdash; Shadows close in.<br><strong>Revelation</strong> &mdash; The purpose becomes clear.<br><strong>The Transfer</strong> &mdash; One community member is chosen.<br><br><em>The artifact will leave the explorer. That promise will be kept.</em></p>
+                        </div>
+                    </div>
+                    <div class="page-back cover-back">
+                        <div class="page-content">
+                            <p class="cb-text">"If you feel something reading this, <span>stay close.</span><br><br>The paper remembers."</p>
+                            <div class="cb-logo">$ARTIFACT</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="book-shadow"></div>
+        </div>
+
+        <div class="page-nav" id="pageNav">
+            <button class="page-nav-btn active" data-page="-1">Cover</button>
+            <button class="page-nav-btn" data-page="0">Page 1</button>
+            <button class="page-nav-btn" data-page="1">Page 2-3</button>
+            <button class="page-nav-btn" data-page="2">Page 4-5</button>
+            <button class="page-nav-btn" data-page="3">Page 6-7</button>
+            <button class="page-nav-btn" data-page="4">Page 8</button>
+            <button class="page-nav-btn" data-page="5">Back</button>
+        </div>
+
+        <div class="zoom-controls">
+            <button class="zoom-btn" id="zoomIn">+</button>
+            <button class="zoom-btn" id="zoomOut">&minus;</button>
+            <button class="zoom-btn" id="resetView" title="Reset">&#8634;</button>
+        </div>
+
+        <div class="interact-hint">Drag to rotate &middot; Scroll to zoom &middot; Click pages to flip</div>
+    </section>
+
+    <section class="pages-section" id="story">
+        <div class="section-header reveal">
+            <div class="section-label">The Chronicle</div>
+            <h2 class="section-title">Turn the Pages</h2>
+        </div>
+        <div class="slider-wrapper">
+            <div class="slider-viewport">
+                <div class="slider-track" id="sliderTrack">
+                    <div class="page-spread">
+                        <div class="page-left">
+                            <div class="page-number">Page I</div>
+                            <h3 class="page-heading">What This Is</h3>
+                            <p class="page-text">Beast Artifact is a community-centered digital asset built around a single, physical relic: <em>the original pencil sketch where a now-unmistakable beast first took shape.</em><br><br>The coin does not represent the artifact. It exists to <strong>protect the story</strong> around it, power the community that discovered it, and eventually determine who will carry it forward.</p>
+                        </div>
+                        <div class="page-right page-image-container">
+                            <img src="beast-sketch-hq.jpg" alt="The Beast Sketch">
+                        </div>
+                    </div>
+                    <div class="page-spread">
+                        <div class="page-left">
+                            <div class="page-number">Page II</div>
+                            <h3 class="page-heading">The Artifact</h3>
+                            <p class="page-text">A single sheet of aged paper bearing a pencil sketch of a roaring beast, frozen mid-snarl. The silhouette, the eyes, the expression &mdash; <em>instantly recognizable.</em><br><br>This is not a recreation. It is not fan art. <strong>It is the origin point.</strong></p>
+                        </div>
+                        <div class="page-right">
+                            <div class="page-number" style="text-align:right;">Provenance</div>
+                            <h3 class="page-heading">Signs of Age</h3>
+                            <p class="page-text"><em>Creases from being folded and hidden.</em><br><em>Stains from unknown moments in its journey.</em><br><em>Worn edges from time and survival.</em><br><br>Every mark is part of its story. The proportions match. The history holds up.</p>
+                        </div>
+                    </div>
+                    <div class="page-spread">
+                        <div class="page-left">
+                            <div class="page-number">Page III</div>
+                            <h3 class="page-heading">The Discovery</h3>
+                            <p class="page-text">The artifact surfaced because <em>the person holding it is the same person who first created it.</em><br><br>Years ago, before the beast became a symbol, the explorer drew it. Simply as an idea &mdash; <strong>pencil meeting paper, instinct guiding hand.</strong></p>
+                        </div>
+                        <div class="page-right">
+                            <div class="page-number" style="text-align:right;">Recognition</div>
+                            <h3 class="page-heading">The Realization</h3>
+                            <p class="page-text">When the explorer returned to the sketch, the recognition was unavoidable.<br><br><em>The same lines that would later be refined, digitized, and repeated at global scale were already there.</em><br><br>The proof was already in his possession.</p>
+                        </div>
+                    </div>
+                    <div class="page-spread">
+                        <div class="page-left">
+                            <div class="page-number">Page IV</div>
+                            <h3 class="page-heading">The Explorer</h3>
+                            <p class="page-text">The artifact is currently held by a nameless explorer &mdash; <em>a guide, not an owner.</em><br><br>Their role is simple: <strong>protect the artifact</strong> until the community it belongs to reveals itself.</p>
+                        </div>
+                        <div class="page-right">
+                            <div class="page-number" style="text-align:right;">The Believers</div>
+                            <h3 class="page-heading">The Community</h3>
+                            <p class="page-text">This project has no audience. <strong>Only believers.</strong><br><br><em>The community does not watch the story. They power it.</em></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slider-controls">
+                <button class="slider-btn" id="prevBtn" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="slider-dots" id="sliderDots"></div>
+                <button class="slider-btn" id="nextBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="artifact-section" id="artifact">
+        <div class="artifact-showcase">
+            <div class="artifact-image-wrapper reveal">
+                <img src="beast-sketch-hq.jpg" alt="The Beast Artifact" class="artifact-img">
+            </div>
+            <div class="artifact-details reveal reveal-delay-2">
+                <h2>The <span>Artifact</span></h2>
+                <p class="page-text" style="margin-bottom: 1.5rem;">A single sheet of aged paper bearing a pencil sketch of a roaring beast, frozen mid-snarl. Instantly recognizable to anyone familiar with the creator economy.</p>
+                <ul class="artifact-list">
+                    <li>Creases from being folded and hidden</li>
+                    <li>Stains from unknown moments in its journey</li>
+                    <li>Worn edges from time and survival</li>
+                    <li>Every mark is part of its story</li>
+                    <li>Verification is possible through line work and structure</li>
+                </ul>
+                <p class="page-text" style="font-style: italic; color: var(--text-muted); margin-top: 1.5rem;">The lines can be examined. The proportions match. The history holds up.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="journey-section" id="journey">
+        <div class="section-header reveal">
+            <div class="section-label">The Long Arc</div>
+            <h2 class="section-title">The Journey Unfolds</h2>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item"><div class="timeline-phase">Phase I</div><h3 class="timeline-title">Discovery</h3><p class="timeline-desc">The artifact is revealed. A single pencil sketch, hidden for years, resurfaces. The origin point is recognized.</p></div>
+            <div class="timeline-item"><div class="timeline-phase">Phase II</div><h3 class="timeline-title">Awakening</h3><p class="timeline-desc">Its influence becomes undeniable. The community forms. Believers gather. Moments of unexplained alignment begin.</p></div>
+            <div class="timeline-item"><div class="timeline-phase">Phase III</div><h3 class="timeline-title">The Hunt</h3><p class="timeline-desc">Shadows close in. The story intensifies. The artifact draws attention from those who understand what it means.</p></div>
+            <div class="timeline-item"><div class="timeline-phase">Phase IV</div><h3 class="timeline-title">Revelation</h3><p class="timeline-desc">The artifact's purpose becomes clear. What was hidden is now understood. The truth reveals itself.</p></div>
+            <div class="timeline-item"><div class="timeline-phase">Phase V</div><h3 class="timeline-title">The Transfer</h3><p class="timeline-desc">One community member is chosen. The artifact will leave the explorer. That promise will be kept.</p></div>
+        </div>
+    </section>
+
+    <section class="principles-section" id="community">
+        <div class="section-header reveal">
+            <div class="section-label">What this is not</div>
+            <h2 class="section-title">Principles</h2>
+        </div>
+        <div class="principles-grid reveal reveal-delay-1">
+            <div class="principle-card"><div class="principle-icon">I</div><h4 class="principle-title">Not a Promotion</h4><p class="principle-desc">A story anchored to a real object. No hype. No manufactured urgency. Just truth on paper.</p></div>
+            <div class="principle-card"><div class="principle-icon">II</div><h4 class="principle-title">Not Financial Advice</h4><p class="principle-desc">No promises of outcomes. No endorsements. No claims beyond what the artifact itself reveals.</p></div>
+            <div class="principle-card"><div class="principle-icon">III</div><h4 class="principle-title">Community Powered</h4><p class="principle-desc">Engagement is not consumption &mdash; it is participation. Every act of attention strengthens the story.</p></div>
+            <div class="principle-card"><div class="principle-icon">IV</div><h4 class="principle-title">The Paper Remembers</h4><p class="principle-desc">Artifacts disappear when locked away. This one refuses. It insists on being seen. It insists on being believed.</p></div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="cta-content reveal">
+            <p class="cta-quote">"If you feel something reading this, <span>stay close.</span><br>The paper remembers."</p>
+            <p class="cta-sub">What happens next depends on the community. The artifact insists on ending up exactly where it began &mdash; with the people who recognize it.</p>
+            <div class="cta-buttons">
+                <a href="https://x.com/BeastArtifact" target="_blank" class="btn-primary">Follow @BeastArtifact</a>
+                <a href="#origin" class="btn-secondary">Return to Origin</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-logo">$ARTIFACT</div>
+        <p class="footer-text">A story anchored to a real object.<br>Not a promotion. Not a sale. Not financial advice.</p>
+        <div class="footer-links">
+            <a href="https://x.com/BeastArtifact" target="_blank">X / Twitter</a>
+            <a href="#origin">Origin</a>
+            <a href="#story">Story</a>
+            <a href="#journey">Journey</a>
+        </div>
+    </footer>
+
+    <script>
+    (function() {
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 50));
+
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
+        navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+        navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => navLinks.classList.remove('open')));
+
+        // === 3D BOOK ===
+        const scene = document.getElementById('scene');
+        const book = document.getElementById('book3d');
+        const pages = [
+            document.getElementById('page0'),
+            document.getElementById('page1'),
+            document.getElementById('page2'),
+            document.getElementById('page3'),
+            document.getElementById('page4')
+        ];
+        const navBtns = document.querySelectorAll('.page-nav-btn');
+
+        let rotX = -8, rotY = -25;
+        let targetRotX = -8, targetRotY = -25;
+        let zoom = 1, targetZoom = 1;
+        let isDragging = false;
+        let lastMouseX = 0, lastMouseY = 0;
+        let autoRotate = true;
+        let autoRotateAngle = 0;
+
+        function updateBook() {
+            rotX += (targetRotX - rotX) * 0.1;
+            rotY += (targetRotY - rotY) * 0.1;
+            zoom += (targetZoom - zoom) * 0.1;
+
+            if (autoRotate && !isDragging) {
+                autoRotateAngle += 0.15;
+                const wobbleY = Math.sin(autoRotateAngle * 0.02) * 3;
+                const wobbleX = Math.sin(autoRotateAngle * 0.015) * 1.5;
+                book.style.transform = `rotateX(${rotX + wobbleX}deg) rotateY(${rotY + wobbleY}deg) scale3d(${zoom},${zoom},${zoom})`;
+            } else {
+                book.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(${zoom},${zoom},${zoom})`;
+            }
+            requestAnimationFrame(updateBook);
+        }
+        updateBook();
+
+        scene.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            autoRotate = false;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            targetRotY += (e.clientX - lastMouseX) * 0.4;
+            targetRotX -= (e.clientY - lastMouseY) * 0.3;
+            targetRotX = Math.max(-40, Math.min(40, targetRotX));
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        window.addEventListener('mouseup', () => { isDragging = false; });
+
+        scene.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            autoRotate = false;
+            lastMouseX = e.touches[0].clientX;
+            lastMouseY = e.touches[0].clientY;
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            targetRotY += (e.touches[0].clientX - lastMouseX) * 0.4;
+            targetRotX -= (e.touches[0].clientY - lastMouseY) * 0.3;
+            targetRotX = Math.max(-40, Math.min(40, targetRotX));
+            lastMouseX = e.touches[0].clientX;
+            lastMouseY = e.touches[0].clientY;
+        }, { passive: true });
+
+        window.addEventListener('touchend', () => { isDragging = false; });
+
+        scene.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            autoRotate = false;
+            targetZoom = Math.max(0.5, Math.min(2, targetZoom - e.deltaY * 0.001));
+        }, { passive: false });
+
+        document.getElementById('zoomIn').addEventListener('click', () => { autoRotate = false; targetZoom = Math.min(2, targetZoom + 0.15); });
+        document.getElementById('zoomOut').addEventListener('click', () => { autoRotate = false; targetZoom = Math.max(0.5, targetZoom - 0.15); });
+        document.getElementById('resetView').addEventListener('click', () => { targetRotX = -8; targetRotY = -25; targetZoom = 1; autoRotate = true; });
+
+        // Page flipping
+        function flipToPage(targetIndex) {
+            let flipCount;
+            if (targetIndex === -1) flipCount = 0;
+            else if (targetIndex === 5) flipCount = pages.length;
+            else flipCount = targetIndex + 1;
+
+            pages.forEach((page, i) => {
+                if (i < flipCount) {
+                    page.style.transform = 'rotateY(-180deg)';
+                    page.style.zIndex = i + 1;
+                } else {
+                    page.style.transform = 'rotateY(0deg)';
+                    page.style.zIndex = pages.length - i;
+                }
+            });
+
+            navBtns.forEach(btn => btn.classList.remove('active'));
+            navBtns.forEach(btn => {
+                if (parseInt(btn.dataset.page) === targetIndex) btn.classList.add('active');
+            });
+        }
+
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => flipToPage(parseInt(btn.dataset.page)));
+        });
+
+        // === SLIDER ===
+        const track = document.getElementById('sliderTrack');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dotsContainer = document.getElementById('sliderDots');
+        const slides = track.querySelectorAll('.page-spread');
+        let currentSlide = 0;
+
+        slides.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.classList.add('slider-dot');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        });
+
+        function goToSlide(index) {
+            currentSlide = index;
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            dotsContainer.querySelectorAll('.slider-dot').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+        }
+
+        prevBtn.addEventListener('click', () => { if (currentSlide > 0) goToSlide(currentSlide - 1); });
+        nextBtn.addEventListener('click', () => { if (currentSlide < slides.length - 1) goToSlide(currentSlide + 1); });
+
+        let stx = 0;
+        const vp = document.querySelector('.slider-viewport');
+        vp.addEventListener('touchstart', e => { stx = e.changedTouches[0].screenX; }, { passive: true });
+        vp.addEventListener('touchend', e => {
+            const diff = stx - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0 && currentSlide < slides.length - 1) goToSlide(currentSlide + 1);
+                else if (diff < 0 && currentSlide > 0) goToSlide(currentSlide - 1);
+            }
+        }, { passive: true });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' && currentSlide < slides.length - 1) goToSlide(currentSlide + 1);
+            if (e.key === 'ArrowLeft' && currentSlide > 0) goToSlide(currentSlide - 1);
+        });
+
+        // === SCROLL REVEAL ===
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.reveal, .timeline-item').forEach(el => observer.observe(el));
+    })();
+    </script>
+</body>
+</html>
